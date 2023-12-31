@@ -24,6 +24,7 @@ public class MH_Responses : MonoBehaviour
         public UnityEvent action;
         public float suspicion;
     }
+  
 
     public List<questionList> list = new List<questionList>();
 
@@ -33,23 +34,28 @@ public class MH_Responses : MonoBehaviour
    
     [SerializeField]
     private GameObject textObj;
-
-    private int progression;
-
-    public float suspicionMeter, worryMeter;
+    [Header("gameProgression")]
+    public int progression;
+    [Header("The meters that influence the game state")]
+    public float suspicionMeter;
+    public float worryMeter;
     
     private CanvasGroup cg;
 
     questionList obj;
  
     public void assignValue(){
-        FadeChoice(1);
-        //loops to plaster the answers on the buttons 
-        textObj.GetComponent<Text>().text = obj.question;
-      for(int i = 0; i < obj.answers.Count; i++){
-        buttonList[i].transform.GetChild(0).GetComponent<Text>().text = obj.answers[i].answer;
-      }
-      StartCoroutine(scareMeter());
+   
+         if(progression < list.Count){
+            FadeChoice(cg,1);
+            obj = list[progression];
+            //loops to plaster the answers on the buttons 
+            textObj.GetComponent<Text>().text = obj.question;
+            for(int i = 0; i < obj.answers.Count; i++){
+                buttonList[i].transform.GetChild(0).GetComponent<Text>().text = obj.answers[i].answer;
+            }
+            StartCoroutine(scareMeter());
+        }
     }
 
     public IEnumerator scareMeter(){
@@ -76,16 +82,17 @@ public class MH_Responses : MonoBehaviour
            if(progression < list.Count)
                 obj = list[progression];
         }
-        FadeChoice(0);   
+        FadeChoice(cg,0);   
     }
 
     void Awake(){
         cg = GetComponent<CanvasGroup>();
-        obj = list[progression];
+        FadeChoice(cg,0);   
     }
     
-    public void FadeChoice(int num){
+    public void FadeChoice(CanvasGroup cg, int num){
         cg.alpha = num;
         cg.interactable = (num == 1) ? true:false;
+        cg.blocksRaycasts = (num == 1) ? true:false;
     }
 }

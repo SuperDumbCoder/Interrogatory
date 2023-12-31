@@ -9,8 +9,7 @@ public class MH_DecideGuilty : MonoBehaviour
     [SerializeField]
     private GameObject textObj;
 
-
-    public float decide(float s, List<MH_Responses.questionList> l){
+    public bool decide(float s, List<MH_Responses.questionList> l){
         float sum =0;
         for(int i = 0; i < l.Count; i++){
             float c = Mathf.Abs(l[i].score - 100);
@@ -18,28 +17,24 @@ public class MH_DecideGuilty : MonoBehaviour
             sum += c;
         }
         sum = sum/l.Count;
-        Debug.Log("score " + (sum));
-        return s + sum;
+        return ((s + sum) > 65);
     }
 
-    public bool isGuilty(){
-        float finalValue = decide(r.suspicionMeter,r.list);
-        return (finalValue > 65);
-    }
 
     public void verdict(){
         string name = "";
-        if(isGuilty()){
+        if(decide(r.suspicionMeter,r.list)){
             RenderSettings.ambientLight = new Color(1,0.0282f,0);
             name = "Guilty";
         }else{
             RenderSettings.ambientLight = new Color(0.63f,0.63f,0.63f);
             name = "Innocent";
         }
-        textObj.GetComponent<CanvasGroup>().alpha = 1;
+        r.FadeChoice(textObj.GetComponent<CanvasGroup>(),1);
         textObj.GetComponent<Text>().text = name;
     }
 
+  
     // Start is called before the first frame update
     void Start()
     {

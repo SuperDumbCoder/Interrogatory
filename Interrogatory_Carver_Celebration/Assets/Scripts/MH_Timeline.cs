@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System;
+using UnityEngine.SceneManagement;
 
 public class MH_Timeline : MonoBehaviour
 {
@@ -19,10 +20,8 @@ public class MH_Timeline : MonoBehaviour
        
     }
 
-    [SerializeField]
-    private List<scene> scenes = new List<scene>();
-
-    
+ 
+    public List<scene> scenes = new List<scene>();
 
     [SerializeField]
     private MH_AudioSourcer source;
@@ -30,23 +29,20 @@ public class MH_Timeline : MonoBehaviour
     [SerializeField]
     private string buttonTagName;
 
-    
+    public int progression = 0;
 
-    bool inputDetected;
+    bool inputDetected, start;
     scene obj = null;
     // Start is called before the first frame update
     void Start()
     {
      
-      StartCoroutine(gameState());  
+     
     }
 
-   
-    
    IEnumerator gameState(){
         //iterates scenes until the end, allow for questions to play 
-       int currentScene = 0;
-       while(currentScene < scenes.Count - 1){
+       for(int currentScene = progression; currentScene < scenes.Count -1; currentScene++){
        obj = scenes[currentScene];
 
            if(scenes[currentScene].action != null)
@@ -61,9 +57,8 @@ public class MH_Timeline : MonoBehaviour
            
         yield return new WaitForSeconds(scenes[currentScene].time);
 
-        currentScene++;
         yield return new WaitForSeconds(0.25f);
-
+        progression = currentScene;
         }
         
         scenes[scenes.Count - 1].action.Invoke();
@@ -79,8 +74,17 @@ public class MH_Timeline : MonoBehaviour
       inputDetected = true;
       obj.fadeOut.Invoke();
     }
+
+    public void restartGame(){
+        Destroy(GameObject.Find("gameData"));
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     // Update is called once per frame
     void Update()
     {
+        if(start == false){
+       StartCoroutine(gameState());  
+          start = true;
+        }
     }
 }
